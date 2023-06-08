@@ -2,29 +2,59 @@ import React, { Component } from 'react'
 
 export default class TodoFooter extends Component {
   render() {
+    const { list } = this.props
+    if (!list.length) {
+      return null
+    }
+    const leftCount = list.filter(item => !item.done).length
+    const isShow = list.some(item => item.done)
+    const { type } = this.props
     return (
       <footer className="footer">
-        {/* This should be `0 items left` by default */}
         <span className="todo-count">
-          <strong>0</strong> item left
+          <strong>{leftCount}</strong> item left
         </span>
-        {/* Remove this if you don't implement routing */}
         <ul className="filters">
           <li>
-            <a className="selected" href="#/">
+            <a
+              onClick={() => this.handleClick('all')}
+              className={type === 'all' ? 'selected' : ''}
+              href="#/"
+            >
               All
             </a>
           </li>
           <li>
-            <a href="#/active">Active</a>
+            <a
+              onClick={() => this.handleClick('active')}
+              className={type === 'active' ? 'selected' : ''}
+              href="#/active"
+            >
+              Active
+            </a>
           </li>
           <li>
-            <a href="#/completed">Completed</a>
+            <a
+              onClick={() => this.handleClick('completed')}
+              className={type === 'completed' ? 'selected' : ''}
+              href="#/completed"
+            >
+              Completed
+            </a>
           </li>
         </ul>
-        {/* <!-- Hidden if no completed items are left ↓ --> */}
-        <button className="clear-completed">Clear completed</button>
+        {isShow && (
+          <button className="clear-completed" onClick={this.clearTodo}>
+            Clear completed
+          </button>
+        )}
       </footer>
     )
+  }
+  clearTodo = () => {
+    this.props.clearTodo()
+  }
+  handleClick = type => {
+    this.props.changeType(type)
   }
 }

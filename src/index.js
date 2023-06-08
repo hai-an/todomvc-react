@@ -10,26 +10,63 @@ import TodoFooter from './components/TodoFooter'
 
 class App extends Component {
   state = {
-    list: [
-      { id: 1, name: '吃饭', done: false },
-      { id: 2, name: '睡觉', done: true },
-      { id: 3, name: '打豆豆', done: false },
-    ],
+    list: [],
+    type: 'active',
+    // 默认 all active completed
   }
   render() {
-    const { list } = this.state
+    const { list, type } = this.state
     return (
       <section className="todoapp">
         <TodoHeader addTodo={this.addTodo}></TodoHeader>
         <TodoMain
           list={list}
+          type={type}
           delTodoById={this.delTodoById}
           updateDoneById={this.updateDoneById}
           editTodo={this.editTodo}
+          checkedAll={this.checkedAll}
         ></TodoMain>
-        <TodoFooter></TodoFooter>
+        <TodoFooter
+          list={list}
+          clearTodo={this.clearTodo}
+          type={type}
+          changeType={this.changeType}
+        ></TodoFooter>
       </section>
     )
+  }
+  /*******
+   * @description: 全选功能-控制所有done的状态
+   * @param {*} done 完成状态
+   * @return {*}
+   */
+  checkedAll = done => {
+    this.setState({
+      list: this.state.list.map(item => {
+        return {
+          ...item,
+          done,
+        }
+      }),
+    })
+  }
+  /*******
+   * @description: 改变todo任务状态
+   * @param {*} type
+   * @return {*}
+   */
+  changeType = type => {
+    this.setState({ type })
+  }
+  /*******
+   * @description: 清空已完成
+   * @return {*}
+   */
+  clearTodo = () => {
+    this.setState({
+      list: this.state.list.filter(item => !item.done),
+    })
   }
   /*******
    * @description:  添加todo事件
@@ -78,6 +115,12 @@ class App extends Component {
       }),
     })
   }
+  /*******
+   * @description: 编辑todo任务
+   * @param {*} id 唯一标识
+   * @param {*} name 任务名
+   * @return {*}
+   */
   editTodo = (id, name) => {
     this.setState({
       list: this.state.list.map(item => {
@@ -88,6 +131,21 @@ class App extends Component {
         }
       }),
     })
+  }
+
+  /*******
+   * @description: 数据保存到本地-钩子函数
+   * @return {*}
+   */
+  componentDidUpdate() {
+    localStorage.setItem('todos', JSON.stringify(this.state.list))
+  }
+  /*******
+   * @description: 从本地读取数据-钩子函数
+   * @return {*}
+   */
+  componentDidMount() {
+    this.setState({ list: JSON.parse(localStorage.getItem('todos')) || [] })
   }
 }
 
